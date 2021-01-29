@@ -11,21 +11,15 @@ public class GizmoStruct {
 
 public class CustomEditor : EditorWindow
 {
-    string Spawn = "Spawn";
-    string PNJtoHelp= "PNJ to Help";
-    string BossArena= "Boss Arena";
-    string EndLevel= "End Level";
-    string FirstFight= "First Fight";
+
     public Vector3[] DefultPositions= new Vector3[5];
     public Vector3[] GizmoSphere =new Vector3[5];
     public Vector3[] SphereEditor = new Vector3[5];
-    //public GizmoStruct[] Gizmo = new GizmoStruct[5];
     public List<GizmoStruct> Gizmo = new List<GizmoStruct>();
-    //private int[] controlIds;
-    int id = 0;
+
     string EditBtn = "Edit";
     bool FirstRun = true;
-    Rect newRect;
+    
     int x = 0;
     public int Selected=0;
     public int RemSelected = 0;
@@ -66,67 +60,23 @@ public class CustomEditor : EditorWindow
         EditorGUILayout.LabelField("Position");
 
         GUILayout.EndHorizontal();
+        for (int i = 0; i < Gizmo.Count; i++)
+        {
+            GUILayout.BeginHorizontal("box");
+            Gizmo[i].label = EditorGUILayout.TextField(Gizmo[i].label, EditorStyles.miniTextField);
+            x = EditorGUILayout.IntField("X", x);
+            SphereEditor[i].y = EditorGUILayout.IntField("Y", (int)SphereEditor[i].y);
+            SphereEditor[i].z = EditorGUILayout.IntField("Z", (int)SphereEditor[i].z);
+            if (GUILayout.Button(EditBtn))
+            {
+                Gizmo[i].label = Gizmo[i].label;
+                Gizmo[i].Sphere = SphereEditor[i];
+            }
+            GUILayout.EndHorizontal();
+        }
         
-        GUILayout.BeginHorizontal("box");
-        Spawn = EditorGUILayout.TextField(Spawn, EditorStyles.miniTextField);
-        x=EditorGUILayout.IntField("X", x);
-        SphereEditor[0].y=EditorGUILayout.IntField("Y", (int)SphereEditor[0].y);
-        SphereEditor[0].z=EditorGUILayout.IntField("Z", (int)SphereEditor[0].z);
-        if (GUILayout.Button(EditBtn))
-        {
-            Gizmo[0].label= Spawn;
-            Gizmo[0].Sphere= SphereEditor[0];
-        }
-        GUILayout.EndHorizontal();
 
-        GUILayout.BeginHorizontal("box");
-        EndLevel = EditorGUILayout.TextField(EndLevel, EditorStyles.miniTextField);
-        SphereEditor[1].x=EditorGUILayout.IntField("X", (int)SphereEditor[1].x);
-        SphereEditor[1].y=EditorGUILayout.IntField("Y", (int)SphereEditor[1].y);
-        SphereEditor[1].z=EditorGUILayout.IntField("Z", (int)SphereEditor[1].z);
-        if (GUILayout.Button(EditBtn))
-        {
-            Gizmo[1].label = EndLevel;
-            Gizmo[1].Sphere = SphereEditor[1];
-        }
-        GUILayout.EndHorizontal();
-
-
-        GUILayout.BeginHorizontal("box");
-        FirstFight = EditorGUILayout.TextField(FirstFight, EditorStyles.miniTextField);
-        SphereEditor[2].x=EditorGUILayout.IntField("X", (int)SphereEditor[2].x);
-        SphereEditor[2].y=EditorGUILayout.IntField("Y", (int)SphereEditor[2].y);
-        SphereEditor[2].z=EditorGUILayout.IntField("Z", (int)SphereEditor[2].z);
-        if (GUILayout.Button(EditBtn))
-        {
-            Gizmo[2].label = FirstFight;
-            Gizmo[2].Sphere = SphereEditor[2];
-        }
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal("box");
-        PNJtoHelp=EditorGUILayout.TextField(PNJtoHelp, EditorStyles.miniTextField);
-        SphereEditor[3].x=EditorGUILayout.IntField("X", (int)SphereEditor[3].x);
-        SphereEditor[3].y=EditorGUILayout.IntField("Y", (int)SphereEditor[3].y);
-        SphereEditor[3].z=EditorGUILayout.IntField("Z", (int)SphereEditor[3].z);
-        if (GUILayout.Button(EditBtn))
-        {
-            Gizmo[3].label = PNJtoHelp;
-            Gizmo[3].Sphere = SphereEditor[3];
-        }
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal("box");
-        BossArena=EditorGUILayout.TextField(BossArena, EditorStyles.miniTextField);
-        SphereEditor[4].x=EditorGUILayout.IntField("X", (int)SphereEditor[4].x);
-        SphereEditor[4].y=EditorGUILayout.IntField("Y", (int)SphereEditor[4].y);
-        SphereEditor[4].z=EditorGUILayout.IntField("Z", (int)SphereEditor[4].z);
-        if (GUILayout.Button(EditBtn))
-        {
-            Gizmo[4].label = BossArena;
-            Gizmo[4].Sphere = SphereEditor[4];
-        }
-        GUILayout.EndHorizontal();
+        
         
     }
     void OnSceneGUI(SceneView sv)
@@ -166,7 +116,7 @@ public class CustomEditor : EditorWindow
             DefultPositions[4] = new Vector3(80, 20, 75);
             FirstRun = false;
         }
-        //Draw your handles here
+        string mmm= GUIUtility.systemCopyBuffer;
         Handles.color = Color.black;
         GUIStyle style = new GUIStyle();
         style.normal.textColor = Color.black;
@@ -185,8 +135,8 @@ public class CustomEditor : EditorWindow
             Vector3 NewPos = Gizmo[i].Sphere;
             NewPos = Handles.FreeMoveHandle(NewPos, Quaternion.identity, 3f, Vector3.zero, (controlID, position, rotation, size) =>
             {
-                id = controlID;
-                //Handles.RectangleCap(controlID, position, rotation, size);
+             
+                
                 HandleFunc(controlID, position, rotation, size);
             });
             if (NewPos != Gizmo[i].Sphere)
@@ -196,7 +146,7 @@ public class CustomEditor : EditorWindow
             }
         }
         Event e = Event.current;//https://docs.unity3d.com/ScriptReference/Event-button.html
-        if (e.button == 1 && e.isMouse )//&& GizmoSelected)
+        if (e.button == 1 && e.isMouse )
         {
            
             for(int i=0; i<Gizmo.Count;i++)
@@ -214,9 +164,6 @@ public class CustomEditor : EditorWindow
                     menu.AddItem(new GUIContent("Delete Gizmo"), false, Callback2, "item 2");
                     menu.ShowAsContext();
 
-                       
-                    
-                    
                 }
             }
            
@@ -230,45 +177,23 @@ public class CustomEditor : EditorWindow
     void HandleFunc(int controlID, Vector3 position, Quaternion rotation, float size)
     {
 
-      
+        
         if (controlID == GUIUtility.hotControl)
         {
             GUI.color = Color.red;
             Handles.PositionHandle(position, Quaternion.identity);
-            //GizmoSelected = true;
+          
         }
         else
         {
-            //GizmoSelected = false;
             GUI.color = Color.green;
         }
            
-        //Handles.Label(position, new GUIContent(nodeTexture), m_handleStyle);
+       
         Handles.SphereHandleCap(controlID, position, Quaternion.identity, 1f, EventType.Repaint);
-        /*Rect myRect = new Rect(position, new Vector2(1, 1));
-        Handles.RectangleHandleCap(controlID, position, rotation, size, EventType.Repaint);
-        try
-        {
-            Rects.Add(controlID, myRect);
-            
-            //EditorGUI.DrawRect(GUILayoutUtility.GetLastRect(), Color.blue);
-
-        }
-        catch (System.Exception e)
-        {
-            int a = 0;
-        }*/
+       
       
         GUI.color = Color.white;
     }
-    public void newfunc()
-    { }
+
 }
-/*if (Event.current.type == EventType.MouseDown)
-{
-   int a = 0;
-}[
-if (GUI.changed)
-{
-    int f = GUIUtility.hotControl;
-}*/
