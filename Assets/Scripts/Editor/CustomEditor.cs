@@ -19,8 +19,8 @@ public class CustomEditor : EditorWindow
     public Vector3[] DefultPositions= new Vector3[5];
     public Vector3[] GizmoSphere =new Vector3[5];
     public Vector3[] SphereEditor = new Vector3[5];
-    public GizmoStruct[] Gizmo = new GizmoStruct[5];
-    //public Stack<GizmoStruct> Gizmo = new Stack<GizmoStruct>();
+    //public GizmoStruct[] Gizmo = new GizmoStruct[5];
+    public List<GizmoStruct> Gizmo = new List<GizmoStruct>();
     //private int[] controlIds;
     int id = 0;
     string EditBtn = "Edit";
@@ -28,6 +28,7 @@ public class CustomEditor : EditorWindow
     Rect newRect;
     int x = 0;
     public int Selected=0;
+    public int RemSelected = 0;
     [MenuItem("Window/Custom/Editor Gizmos")]
     public static CustomEditor CustomEd()
     {
@@ -50,6 +51,11 @@ public class CustomEditor : EditorWindow
         Gizmo[Selected].Sphere = DefultPositions[Selected];
         SphereEditor[Selected] = DefultPositions[Selected];
     }
+    public void Callback2(object obj)
+    {
+        Gizmo.RemoveAt(RemSelected);
+        
+    }
     void OnGUI()
     {
         GUILayout.Label("Gizmo Editor", EditorStyles.boldLabel);
@@ -60,7 +66,7 @@ public class CustomEditor : EditorWindow
         EditorGUILayout.LabelField("Position");
 
         GUILayout.EndHorizontal();
-
+        
         GUILayout.BeginHorizontal("box");
         Spawn = EditorGUILayout.TextField(Spawn, EditorStyles.miniTextField);
         x=EditorGUILayout.IntField("X", x);
@@ -130,7 +136,7 @@ public class CustomEditor : EditorWindow
         {
             for (int i = 0; i < 5; i++)
             {
-                Gizmo[i] = new GizmoStruct();
+                Gizmo.Add(  new GizmoStruct());
                 SphereEditor[i] = new Vector3();
                 //Rects[i]= new RectStruct();
             }
@@ -165,7 +171,7 @@ public class CustomEditor : EditorWindow
         GUIStyle style = new GUIStyle();
         style.normal.textColor = Color.black;
         Vector3 LablePos=new Vector3(0,0,0);
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < Gizmo.Count; i++)
         {
             LablePos = Gizmo[i].Sphere;
             LablePos.y=LablePos.y + 1;
@@ -174,7 +180,7 @@ public class CustomEditor : EditorWindow
         Handles.color = Color.white;
 
         //https://forum.unity.com/threads/currently-selected-handle-in-editor-script.87634/
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < Gizmo.Count; i++)
         {
             Vector3 NewPos = Gizmo[i].Sphere;
             NewPos = Handles.FreeMoveHandle(NewPos, Quaternion.identity, 3f, Vector3.zero, (controlID, position, rotation, size) =>
@@ -193,7 +199,7 @@ public class CustomEditor : EditorWindow
         if (e.button == 1 && e.isMouse )//&& GizmoSelected)
         {
            
-            for(int i=0; i<5;i++)
+            for(int i=0; i<Gizmo.Count;i++)
             {
                 
                 Vector3 ScenPos= HandleUtility.WorldToGUIPointWithDepth(Gizmo[i].Sphere);
@@ -202,9 +208,10 @@ public class CustomEditor : EditorWindow
                 {
                     // Now create the menu, add items and show it
                     Selected = i;
+                    RemSelected = i;
                     GenericMenu menu = new GenericMenu();
                     menu.AddItem(new GUIContent("Reset Position"), false, Callback , "item 1");// {  }
-                    menu.AddItem(new GUIContent("Delete Gizmo"), false, Callback, "item 2");
+                    menu.AddItem(new GUIContent("Delete Gizmo"), false, Callback2, "item 2");
                     menu.ShowAsContext();
 
                        
