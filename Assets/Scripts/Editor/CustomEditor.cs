@@ -8,7 +8,7 @@ public class GizmoStruct {
     public string label;
 }
 
-
+[CreateAssetMenu(fileName = "Gizmo Asset", menuName = "Custom/Create Gizmo Asset")]
 public class CustomEditor : EditorWindow
 {
 
@@ -28,9 +28,13 @@ public class CustomEditor : EditorWindow
     {
         return EditorWindow.GetWindow<CustomEditor>("Custom Editor");
     }
+
     void OnEnable()
     {
         SceneView.duringSceneGui += OnSceneGUI;
+        CustomEditor myWindow = (CustomEditor)EditorWindow.GetWindow(typeof(CustomEditor));
+        myWindow.autoRepaintOnSceneChange = true;
+        EditorApplication.modifierKeysChanged += myWindow.Repaint;
     }
 
     void OnDisable()
@@ -52,6 +56,7 @@ public class CustomEditor : EditorWindow
     }
     void OnGUI()
     {
+       
         GUILayout.Label("Gizmo Editor", EditorStyles.boldLabel);
 
         GUILayout.BeginHorizontal("box");
@@ -60,11 +65,13 @@ public class CustomEditor : EditorWindow
         EditorGUILayout.LabelField("Position");
 
         GUILayout.EndHorizontal();
+        EditorGUI.BeginChangeCheck();
         for (int i = 0; i < Gizmo.Count; i++)
         {
+            
             GUILayout.BeginHorizontal("box");
             Gizmo[i].label = EditorGUILayout.TextField(Gizmo[i].label, EditorStyles.miniTextField);
-            x = EditorGUILayout.IntField("X", x);
+            SphereEditor[i].x = EditorGUILayout.IntField("X", (int)SphereEditor[i].x);
             SphereEditor[i].y = EditorGUILayout.IntField("Y", (int)SphereEditor[i].y);
             SphereEditor[i].z = EditorGUILayout.IntField("Z", (int)SphereEditor[i].z);
             if (GUILayout.Button(EditBtn))
@@ -74,13 +81,21 @@ public class CustomEditor : EditorWindow
             }
             GUILayout.EndHorizontal();
         }
-        
+       
+        if (EditorGUI.EndChangeCheck())
+        {
+            //Undo.RecordObject((Object)Gizmo, "Changed Area Of Effect");
+            
+        }
 
-        
-        
+
+
+
+
     }
     void OnSceneGUI(SceneView sv)
     {
+       // CustomEditor t = (Editor.target as CustomEditor);
 
         if (FirstRun)
         {
@@ -116,7 +131,7 @@ public class CustomEditor : EditorWindow
             DefultPositions[4] = new Vector3(80, 20, 75);
             FirstRun = false;
         }
-        string mmm= GUIUtility.systemCopyBuffer;
+        
         Handles.color = Color.black;
         GUIStyle style = new GUIStyle();
         style.normal.textColor = Color.black;
